@@ -84,5 +84,4 @@ function sendAccentColor() {
     }
 
     win.webContents.send("set-accent-color", accentColor)
-    
 }
