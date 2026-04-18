@@ -156,7 +156,7 @@ function openItem(item) {
     }
 }
 
-// SELECTION SYSTEM
+// Selection
 function clearSelected() { 
     selectedSet.clear() 
     selectedIndex = -1
@@ -220,7 +220,7 @@ function renderSelection() {
     })
 }
 
-// PATH NORMALIZER
+// Misc.
 function normalizePath(path) {
     path = path.trim().replaceAll("/", "\\")
 
@@ -231,5 +231,5 @@ function normalizePath(path) {
     return path
 }
 
-// START
+// Starting directory
 navigateTo("C:/")
