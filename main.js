@@ -10,6 +10,7 @@ function createWindow() {
     height: 700,
     minWidth: 300,
     minHeight: 200,
+    icon: path.join(__dirname, "src/misc/icon.png"),
     title: "MFExplorer",
     frame: false,
         webPreferences: {

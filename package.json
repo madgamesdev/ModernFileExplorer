@@ -6,10 +6,29 @@
   "author": "MadGames",
   "type": "commonjs",
   "main": "main.js",
+
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
+
+  "build": {
+    "appId": "com.madgames.mfexplorer",
+    "productName": "MFExplorer",
+    "icon": "src/misc/icon.ico",
+    "win": {
+      "target": "portable"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "src/**/*",
+      "renderer/**/*"
+    ]
+  },
+
   "devDependencies": {
-    "electron": "^40.1.0"
+    "electron": "^40.1.0",
+    "electron-builder": "^26.8.1"
   }
 }
