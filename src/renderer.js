@@ -1,13 +1,23 @@
 const { ipcRenderer } = require('electron')
 
+// UI Stuff
+const addressBar = document.getElementById('addressBar')
 const fileList = document.getElementById("FileList")
 const fileItems = () => Array.from(document.querySelectorAll('.FileItem'))
 
-let selectedIndex = 0
+const backButton = document.getElementById("back-button")
+const forwardButton = document.getElementById("forward-button")
+
+// Explorer Nav Variables
+let selectedIndex = -1
 let anchorIndex = 0
 let selectedSet = new Set()
 let currentItems = []
 
+let history = []
+let historyIndex = -1
+
+// Window controls
 document.getElementById('Minimize').addEventListener('click', () => {
     ipcRenderer.send('window-control', 'minimize')
 })
@@ -20,11 +30,62 @@ document.getElementById('Close').addEventListener('click', () => {
     ipcRenderer.send('window-control', 'close')
 })
 
+// Theme
 ipcRenderer.on("set-accent-color", (_e, color) => {
+    document.documentElement.style.setProperty('--accent-color', color)
     document.getElementById("WindowBorder").style.borderColor = color
 })
 
+// NAVIGATION CORE
+function navigateTo(path, addToHistory = true) {
+    if (!path) return
+
+    path = normalizePath(path)
+
+    loadDirectory(path)
+    addressBar.value = path
+
+    if (addToHistory) {
+        history = history.slice(0, historyIndex + 1)
+        history.push(path)
+        historyIndex++
+    }
+
+    updateNavButtons()
+}
+
+backButton.addEventListener("click", () => {
+    if (historyIndex <= 0) return
+    historyIndex--
+    navigateTo(history[historyIndex], false)
+})
+
+forwardButton.addEventListener("click", () => {
+    if (historyIndex >= history.length - 1) return
+    historyIndex++
+    navigateTo(history[historyIndex], false)
+})
+
+function updateNavButtons() {
+    if (backButton) backButton.disabled = historyIndex <= 0
+    if (forwardButton) forwardButton.disabled = historyIndex >= history.length - 1
+}
+
+// ADDRESS BAR
+addressBar.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        navigateTo(addressBar.value)
+    }
+})
+
+addressBar.addEventListener("focus", () => {
+    addressBar.select()
+})
+
+// Keyboard nav
 document.addEventListener('keydown', (e) => {
+    if (addressBar.matches(':focus')) return
+
     if (e.key === 'ArrowDown') {
         changeSelectionArea(1, e.ctrlKey)
         e.preventDefault()
@@ -35,17 +96,22 @@ document.addEventListener('keydown', (e) => {
     } 
     else if (e.key === 'Enter') {
         const item = currentItems[selectedIndex]
+        if (!item) return
         openItem(item)
         e.preventDefault()
     }
 })
 
+// File List Empty Space Click
 fileList.addEventListener("click", (e) => {
     if (e.ctrlKey || selectedSet.size === 0) return
     clearSelected()
 })
 
+// Load dir
 async function loadDirectory(dir) {
+    if (!dir || typeof dir !== 'string') return
+
     const result = await ipcRenderer.invoke("list-directory", dir)
 
     if (result.error) {
@@ -69,26 +135,28 @@ async function loadDirectory(dir) {
             else clearSelected()
         })
 
-        el.addEventListener("dblclick", (e) => {
+        el.addEventListener("dblclick", () => {
             openItem(item)
         })
 
         fileList.appendChild(el)
     })
 
-    clearSelection()
+    clearSelected()
 }
 
+// OPEN ITEM
 function openItem(item) {
     if (!item) return
 
     if (item.isDirectory) {
-        loadDirectory(item.path)
+        navigateTo(item.path)
     } else {
         ipcRenderer.invoke("open-file", item.path)
     }
 }
 
+// SELECTION SYSTEM
 function clearSelected() { 
     selectedSet.clear() 
     selectedIndex = -1
@@ -118,14 +186,14 @@ function changeSelectionArea(dir, ctrl) {
     const items = fileItems()
     if (!items.length) return
 
+    if (selectedIndex === -1) selectedIndex = 0
+
     let newIndex = selectedIndex + dir
     newIndex = Math.max(0, Math.min(items.length - 1, newIndex))
 
     selectedIndex = newIndex
 
     if (ctrl) {
-        clearSelection()
-
         const start = Math.min(anchorIndex, selectedIndex)
         const end = Math.max(anchorIndex, selectedIndex)
 
@@ -152,4 +220,16 @@ function renderSelection() {
     })
 }
 
-loadDirectory("C:\\")
+// PATH NORMALIZER
+function normalizePath(path) {
+    path = path.trim().replaceAll("/", "\\")
+
+    if (/^[A-Za-z]:$/.test(path)) {
+        path += "\\"
+    }
+
+    return path
+}
+
+// START
+navigateTo("C:/")

@@ -5,6 +5,7 @@
     --title-bar-color: #1e1e1e;
     --title-bar-hl-color: #4d4d4d;
     --border-size: 2px;
+    --accent-color: rgb(168, 15, 168);
 }
 
 html, body{
@@ -56,15 +57,48 @@ html, body{
 #Titlebar #Close:active { background-color: #990e0e; }
 
 #TopBar {
+    --Height: 25px;
     -webkit-app-region: drag; 
     width: 100%;
-    height: 32px;
+    height: calc(16px + var(--Height));
     background-color: var(--title-bar-color);
     outline: solid var(--border-size) var(--title-bar-hl-color);
+    padding: 10px;
 }
 
-#TopBar input, #TopBar button {
+#TopBar button {
     -webkit-app-region: no-drag;
+    background-color: #353535;
+    border: rgb(161, 161, 161) solid 1px;
+    color: white;
+    height: var(--Height);
+    width: 25px;
+    border-radius: 3px;
+}
+#TopBar button:hover {
+    background-color: #575757;
+}
+#TopBar button:active {
+    background-color: #464646;
+    border: var(--accent-color) solid 1px;
+    box-shadow: var(--accent-color) 0px 0px 7px;
+}
+
+#TopBar input {
+    -webkit-app-region: no-drag;
+    height: var(--Height);
+    background-color: #464646;
+    border: rgb(161, 161, 161) solid 1px;
+    color: white;
+    border-radius: 3px;
+}
+#TopBar input:active {
+    border: rgb(161, 161, 161) solid 1px;
+}
+#TopBar input:focus {
+    outline: none;
+    border: var(--accent-color) solid 1px;
+    box-shadow: var(--accent-color) 0px 0px 7px;
 }
 
 #AppWrapper{
@@ -77,7 +111,7 @@ html, body{
 }
 #AppContent { height: 100%; }
 #WindowBorder {
-    border: var(--border-size) rgb(168, 15, 168) solid;
+    border: var(--border-size) var(--accent-color) solid;
     box-sizing: border-box;
     height: 100%;
     width: 100%;
