@@ -70,7 +70,7 @@ html, body{
     outline: solid var(--window-border-thickness) var(--title-bar-hl-color);
     padding: 10px;
     align-items: center;
-    gap: 5px;
+    gap: 7px;
 }
 
 #top-bar button {
