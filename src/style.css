@@ -4,8 +4,10 @@
     --bg-color: #252525;
     --title-bar-color: #1e1e1e;
     --title-bar-hl-color: #4d4d4d;
-    --border-size: 2px;
+    --window-border-thickness: 2px;
+    --border-radius: 4px;
     --accent-color: rgb(168, 15, 168);
+    --light-accent-color: rgb(123, 59, 148);
 }
 
 html, body{
@@ -15,7 +17,7 @@ html, body{
 
 * { box-sizing: border-box; }
 
-#Titlebar {
+#title-bar {
   -webkit-app-region: drag; 
   height: 30px;
   background-color: var(--title-bar-color);
@@ -30,7 +32,7 @@ html, body{
   z-index: 999;
   padding: 0px 0px 0px 5px;
 }
-#WindowControls{
+#window-controls{
     display: flex;
     flex-direction: row;
     width: auto;
@@ -43,7 +45,7 @@ html, body{
     display: flex;
     align-items: center;
 }
-#Titlebar .button {
+#title-bar .button {
     -webkit-app-region: no-drag;
     height: 100%;
     width: 30px;
@@ -51,57 +53,62 @@ html, body{
     justify-content: center;
     align-items: center; 
 }
-#Titlebar .button:hover { background-color: #4e4e4e }
-#Titlebar .button:active { background-color: #353535; }
-#Titlebar #Close:hover { background-color: #ca1717; }
-#Titlebar #Close:active { background-color: #990e0e; }
+#title-bar .button:hover { background-color: #4e4e4e }
+#title-bar .button:active { background-color: #353535; }
+#title-bar #Close:hover { background-color: #ca1717; }
+#title-bar #Close:active { background-color: #990e0e; }
 
-#TopBar {
-    --Height: 25px;
+#top-bar {
+    display: flex;
+    --Height: 28px;
     -webkit-app-region: drag; 
     width: 100%;
     height: calc(16px + var(--Height));
     background-color: var(--title-bar-color);
-    outline: solid var(--border-size) var(--title-bar-hl-color);
+    outline: solid var(--window-border-thickness) var(--title-bar-hl-color);
     padding: 10px;
+    align-items: center;
+    gap: 5px;
 }
 
-#TopBar button {
+#top-bar button {
     -webkit-app-region: no-drag;
     background-color: #353535;
     border: rgb(161, 161, 161) solid 1px;
     color: white;
     height: var(--Height);
-    width: 25px;
-    border-radius: 3px;
+    width: var(--Height);
+    border-radius: var(--border-radius);
+    font-size: 15px;
 }
-#TopBar button:hover {
+#top-bar button:hover {
     background-color: #575757;
 }
-#TopBar button:active {
+#top-bar button:active {
     background-color: #464646;
-    border: var(--accent-color) solid 1px;
-    box-shadow: var(--accent-color) 0px 0px 7px;
+    border: var(--light-accent-color) solid 1px;
+    box-shadow: var(--accent-color) 0px 0px 8px;
 }
 
-#TopBar input {
+#top-bar input {
     -webkit-app-region: no-drag;
     height: var(--Height);
+    width: 100%;
     background-color: #464646;
     border: rgb(161, 161, 161) solid 1px;
     color: white;
-    border-radius: 3px;
+    border-radius: var(--border-radius);
 }
-#TopBar input:active {
+#top-bar input:active {
     border: rgb(161, 161, 161) solid 1px;
 }
-#TopBar input:focus {
+#top-bar input:focus {
     outline: none;
-    border: var(--accent-color) solid 1px;
-    box-shadow: var(--accent-color) 0px 0px 7px;
+    border: var(--light-accent-color) solid 1px;
+    box-shadow: var(--accent-color) 0px 0px 8px;
 }
 
-#AppWrapper{
+#app-wrapper{
     width: 100%;
     height: 100%;
     background-color: white;
@@ -109,9 +116,9 @@ html, body{
     overflow: hidden;
     position: relative;
 }
-#AppContent { height: 100%; }
-#WindowBorder {
-    border: var(--border-size) var(--accent-color) solid;
+#app-content { height: 100%; }
+#window-border {
+    border: var(--window-border-thickness) var(--accent-color) solid;
     box-sizing: border-box;
     height: 100%;
     width: 100%;
@@ -120,7 +127,7 @@ html, body{
     z-index: 1000;
 }
 
-#FileList {
+#file-list {
     background-color: var(--bg-color);
     color: var(--text-color);
 
@@ -131,33 +138,28 @@ html, body{
     height: 100%;
     overflow-y: auto;
 }
-.FileItem {
+.file-item {
     padding: 6px 10px;
-    border-radius: 6px;
+    border-radius: calc(var(--border-radius) + 2px);
     user-select: none;
     color: rgba(255, 255, 255, 0.856);
 }
-
-.FileItem:hover { background-color: #3f3f3f; }
-
-.FileItem:active { background-color: #333333; }
-
-#FileList::-webkit-scrollbar { width: 15px; }
-
-#FileList::-webkit-scrollbar-track { background: transparent; }
-
-#FileList::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-}
-
-#FileList::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.35);
-}
-
-.FileItem.selected {
-    background-color: rgb(37, 101, 221);
+.file-item:hover { background-color: #3f3f3f; }
+.file-item:active { background-color: #333333; }
+.file-item.selected {
+    background-color: var(--light-accent-color);
     color: white;
 }
 
-#FileList::-webkit-scrollbar-thumb:active { background-color: rgba(255, 255, 255, 0.1); }
+/* File List Scroll Bar */
+#file-list::-webkit-scrollbar { width: 15px; }
+#file-list::-webkit-scrollbar-track { background: transparent; }
+#file-list::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius);
+}
+#file-list::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.35);
+}
+
+#file-list::-webkit-scrollbar-thumb:active { background-color: rgba(255, 255, 255, 0.1); }

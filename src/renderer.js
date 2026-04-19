@@ -1,9 +1,10 @@
 const { ipcRenderer } = require('electron')
+const { adjustColorBrightness } = require('./utils')
 
 // UI Stuff
-const addressBar = document.getElementById('addressBar')
-const fileList = document.getElementById("FileList")
-const fileItems = () => Array.from(document.querySelectorAll('.FileItem'))
+const addressBar = document.getElementById('address-bar')
+const fileList = document.getElementById("file-list")
+const fileItems = () => Array.from(document.querySelectorAll('.file-item'))
 
 const backButton = document.getElementById("back-button")
 const forwardButton = document.getElementById("forward-button")
@@ -32,11 +33,13 @@ document.getElementById('Close').addEventListener('click', () => {
 
 // Theme
 ipcRenderer.on("set-accent-color", (_e, color) => {
+    const lightAccentColor = adjustColorBrightness(color, 40)
     document.documentElement.style.setProperty('--accent-color', color)
-    document.getElementById("WindowBorder").style.borderColor = color
+    document.documentElement.style.setProperty('--light-accent-color', lightAccentColor)
+    console.log("light:", lightAccentColor)
 })
 
-// NAVIGATION CORE
+// Navigation
 function navigateTo(path, addToHistory = true) {
     if (!path) return
 
@@ -112,19 +115,23 @@ fileList.addEventListener("click", (e) => {
 async function loadDirectory(dir) {
     if (!dir || typeof dir !== 'string') return
 
-    const result = await ipcRenderer.invoke("list-directory", dir)
+    let result = await ipcRenderer.invoke("list-directory", dir)
 
     if (result.error) {
         fileList.innerText = result.error
         return
     }
+    
+    // FILTER HIDDEN ITEMS
+    result = result.filter(item => !item.hidden) // Might add a setting to change whether
+                                                 // you wanna see hidden files or not
+    currentItems = result 
 
-    currentItems = result
     fileList.innerHTML = ""
 
     result.forEach((item, i) => {
         const el = document.createElement("div")
-        el.className = "FileItem"
+        el.className = "file-item"
 
         el.textContent = item.isDirectory 
             ? `📁 ${item.name}` 

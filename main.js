@@ -1,6 +1,7 @@
-const { app, BrowserWindow, ipcMain, shell, systemPreferences } = require("electron")
-const path = require("path")
-const fs = require("fs")
+const { app, BrowserWindow, ipcMain, shell, systemPreferences } = require('electron')
+const path = require('path')
+const fs = require('fs')
+const fswin = require('fswin')
 
 let win
 
@@ -10,8 +11,8 @@ function createWindow() {
     height: 700,
     minWidth: 300,
     minHeight: 200,
-    icon: path.join(__dirname, "src/misc/icon.png"),
-    title: "MFExplorer",
+    icon: path.join(__dirname, 'src/misc/icon.png'),
+    title: 'MFExplorer',
     frame: false,
         webPreferences: {
         nodeIntegration: true,
@@ -57,11 +58,27 @@ ipcMain.handle("list-directory", async (_event, dirPath) => {
     try {
         const entries = await fs.promises.readdir(dirPath, { withFileTypes: true })
 
-        return entries.map(entry => ({
-            name: entry.name,
-            isDirectory: entry.isDirectory(),
-            path: path.join(dirPath, entry.name)
-        }))
+        const result = []
+
+        for (const entry of entries) {
+            const fullPath = path.join(dirPath, entry.name)
+
+            let isHidden = false
+
+            try {
+                const stats = fswin.getAttributesSync(fullPath)
+                isHidden = stats && stats.IS_HIDDEN
+            } catch { isHidden = false }
+
+            result.push({
+                name: entry.name,
+                isDirectory: entry.isDirectory(),
+                path: fullPath,
+                hidden: isHidden
+            })
+        }
+
+        return result
     } catch (err) {
         return { error: err.message }
     }
