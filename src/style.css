@@ -1,5 +1,5 @@
 :root {
-    --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font: 'Segoe UI', Arial, Geneva, Verdana, sans-serif;
     --text-color: white;
     --bg-color: #252525;
     --title-bar-color: #1e1e1e;
@@ -59,11 +59,13 @@ html, body{
 #title-bar #Close:active { background-color: #990e0e; }
 
 #top-bar {
+    --height: 28px;
+    --element-size: calc(var(--height) + 2px);
+
     display: flex;
-    --Height: 28px;
     -webkit-app-region: drag; 
     width: 100%;
-    height: calc(16px + var(--Height));
+    height: calc(16px + var(--height));
     background-color: var(--title-bar-color);
     outline: solid var(--window-border-thickness) var(--title-bar-hl-color);
     padding: 10px;
@@ -72,14 +74,17 @@ html, body{
 }
 
 #top-bar button {
+    display: flex;
     -webkit-app-region: no-drag;
     background-color: #353535;
     border: rgb(161, 161, 161) solid 1px;
     color: white;
-    height: var(--Height);
-    width: var(--Height);
+    height: var(--element-size);
+    width: calc(var(--element-size) + 2px);
     border-radius: var(--border-radius);
-    font-size: 15px;
+    font-size: calc(var(--element-size) / 2px);
+    justify-content: center;
+    align-items: center;
 }
 #top-bar button:hover {
     background-color: #575757;
@@ -92,12 +97,13 @@ html, body{
 
 #top-bar input {
     -webkit-app-region: no-drag;
-    height: var(--Height);
+    height: var(--element-size);
     width: 100%;
     background-color: #464646;
     border: rgb(161, 161, 161) solid 1px;
     color: white;
     border-radius: var(--border-radius);
+    font-size: calc(var(--element-size) / 2);
 }
 #top-bar input:active {
     border: rgb(161, 161, 161) solid 1px;
@@ -156,7 +162,7 @@ html, body{
 #file-list::-webkit-scrollbar-track { background: transparent; }
 #file-list::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.2);
-    border-radius: var(--border-radius);
+    border-radius: 3px;
 }
 #file-list::-webkit-scrollbar-thumb:hover {
     background-color: rgba(255, 255, 255, 0.35);
