@@ -162,7 +162,7 @@ html, body{
     /* background-image: linear-gradient(var(--light-accent-color), var(--accent-color)); frutiger aero style*/
     background-color: var(--accent-color);
     color: white;
-    box-shadow: rgba(0, 0, 0, 0.356) 2px 3px 15px;
+    box-shadow: rgba(0, 0, 0, 0.356) 1px 2px 18px;
 }
 
 .file-item.selected::after {
