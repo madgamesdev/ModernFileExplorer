@@ -32,6 +32,11 @@ function adjustColorBrightness(color, amount){
     )
 }
 
+/**
+ * 
+ * @param {number} bytes Bytes of let's say a file or a collection of files 
+ * @returns {string} User-friendly file size
+ */
 function facilitateSize(bytes) {
     if (bytes === 0) return "0 B"
 
@@ -43,6 +48,12 @@ function facilitateSize(bytes) {
     return `${size.toFixed(i === 0 ? 0 : 1)} ${units[i]}`
 }
 
+
+/**
+ * 
+ * @param {string} input User input directory path
+ * @returns A path that will not break the program
+ */
 function normalizePath(input) {
     if (!input) return input
 

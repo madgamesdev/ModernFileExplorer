@@ -40,8 +40,10 @@ document.getElementById('Close').addEventListener('click', () => {
 // Theme
 ipcRenderer.on("set-accent-color", (_e, color) => {
     const lightAccentColor = adjustColorBrightness(color, 40)
+    const lighterAccentColor = adjustColorBrightness(color, 70)
     document.documentElement.style.setProperty('--accent-color', color)
     document.documentElement.style.setProperty('--light-accent-color', lightAccentColor)
+    document.documentElement.style.setProperty('--lighter-accent-color', lighterAccentColor)
 })
 
 function refreshPage() { navigateTo(currentDir, false) }

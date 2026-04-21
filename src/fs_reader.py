@@ -6,7 +6,7 @@ import os
 import sys
 import stat
 import json
-    
+
 def isHidden(item):
     if item.name.startswith("."): 
         return True # Ideally we should hide all items starting with .
