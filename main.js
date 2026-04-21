@@ -1,7 +1,6 @@
 const { app, BrowserWindow, ipcMain, shell, systemPreferences } = require('electron')
+const { spawn } = require('child_process')
 const path = require('path')
-const fs = require('fs')
-const fswin = require('fswin')
 
 let win
 
@@ -14,16 +13,24 @@ function createWindow() {
     icon: path.join(__dirname, 'src/misc/icon.png'),
     title: 'MFExplorer',
     frame: false,
-        webPreferences: {
+    webPreferences: {
         nodeIntegration: true,
-        contextIsolation: false,
-        },
+        contextIsolation: false
+    }
     })
 
-    win.loadFile(path.join(__dirname, "src", "index.html"))
+    win.loadFile(path.join(__dirname, 'src', 'index.html'))
 
-    win.webContents.on("did-finish-load", sendAccentColor)
-    if (process.platform === "win32"){
+    py = spawn("python", [path.join(__dirname, 'src', 'fs_reader.py')])
+
+    py.stdout.on("data", (data) => {
+        const msg = data.toString()
+
+        if (msg.includes('init')) return
+    })
+
+    win.webContents.on('did-finish-load', sendAccentColor)
+    if (process.platform === 'win32'){
         systemPreferences.on("accent-color-changed", () => {
         sendAccentColor()
     })
@@ -33,7 +40,8 @@ function createWindow() {
 app.whenReady().then(createWindow)
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit()
+    if (py) py.kill()
+    if (process.platform !== 'darwin') app.quit()
 })
 
 ipcMain.on('window-control', (event, action) => {
@@ -55,33 +63,36 @@ ipcMain.on('window-control', (event, action) => {
 })
 
 ipcMain.handle("list-directory", async (_event, dirPath) => {
-    try {
-        const entries = await fs.promises.readdir(dirPath, { withFileTypes: true })
+    return new Promise((resolve) => {
+        let output = ''; let error = ''
 
-        const result = []
-
-        for (const entry of entries) {
-            const fullPath = path.join(dirPath, entry.name)
-
-            let isHidden = false
+        const onData = (data) => {
+            output += data.toString()
 
             try {
-                const stats = fswin.getAttributesSync(fullPath)
-                isHidden = stats && stats.IS_HIDDEN
-            } catch { isHidden = false }
+                const parsed = JSON.parse(output.trim())
 
-            result.push({
-                name: entry.name,
-                isDirectory: entry.isDirectory(),
-                path: fullPath,
-                hidden: isHidden
-            })
+                cleanup()
+                resolve(parsed)
+            } catch {}
         }
 
-        return result
-    } catch (err) {
-        return { error: err.message }
-    }
+        const onError = (data) => {
+            error += data.toString()
+            cleanup()
+            resolve({ error })
+        }
+
+        const cleanup = () => {
+            py.stdout.off('data', onData)
+            py.stderr.off('data', onError)
+        }
+
+        py.stdout.on('data', onData)
+        py.stderr.on('data', onError)
+
+        py.stdin.write(dirPath + '\n')
+    })
 })
 
 ipcMain.handle('open-file', async (_event, filePath) => {

@@ -1,5 +1,6 @@
 const { ipcRenderer } = require('electron')
-const { adjustColorBrightness } = require('./utils')
+const { adjustColorBrightness, facilitateSize, normalizePath } = require('./utils')
+const os = require('os')
 
 // UI Stuff
 const addressBar = document.getElementById('address-bar')
@@ -8,6 +9,9 @@ const fileItems = () => Array.from(document.querySelectorAll('.file-item'))
 
 const backButton = document.getElementById("back-button")
 const forwardButton = document.getElementById("forward-button")
+const refreshButton = document.getElementById("refresh-button")
+
+const homeDir = os.homedir()
 
 // Explorer Nav Variables
 let selectedIndex = -1
@@ -17,6 +21,8 @@ let currentItems = []
 
 let history = []
 let historyIndex = -1
+
+let currentDir = ""
 
 // Window controls
 document.getElementById('Minimize').addEventListener('click', () => {
@@ -36,8 +42,9 @@ ipcRenderer.on("set-accent-color", (_e, color) => {
     const lightAccentColor = adjustColorBrightness(color, 40)
     document.documentElement.style.setProperty('--accent-color', color)
     document.documentElement.style.setProperty('--light-accent-color', lightAccentColor)
-    console.log("light:", lightAccentColor)
 })
+
+function refreshPage() { navigateTo(currentDir, false) }
 
 // Navigation
 function navigateTo(path, addToHistory = true) {
@@ -47,6 +54,8 @@ function navigateTo(path, addToHistory = true) {
 
     loadDirectory(path)
     addressBar.value = path
+
+    currentDir = path
 
     if (addToHistory) {
         history = history.slice(0, historyIndex + 1)
@@ -67,6 +76,10 @@ forwardButton.addEventListener("click", () => {
     if (historyIndex >= history.length - 1) return
     historyIndex++
     navigateTo(history[historyIndex], false)
+})
+
+refreshButton.addEventListener("click", () => {
+    refreshPage()
 })
 
 function updateNavButtons() {
@@ -103,6 +116,7 @@ document.addEventListener('keydown', (e) => {
         openItem(item)
         e.preventDefault()
     }
+    else if (e.key === 'F5') { refreshPage() }
 })
 
 // File List Empty Space Click
@@ -123,7 +137,7 @@ async function loadDirectory(dir) {
     }
     
     // FILTER HIDDEN ITEMS
-    result = result.filter(item => !item.hidden) // Might add a setting to change whether
+    result = result.filter(item => !item.isHidden) // Might add a setting to change whether
                                                  // you wanna see hidden files or not
     currentItems = result 
 
@@ -131,14 +145,22 @@ async function loadDirectory(dir) {
 
     result.forEach((item, i) => {
         const el = document.createElement("div")
+
         el.className = "file-item"
-
-        el.textContent = item.isDirectory 
-            ? `📁 ${item.name}` 
-            : `📄 ${item.name}`
-
+        el.dataset.index = i
+        el.innerHTML = `
+            <span class="item-name">
+                ${item.isDir ? '📁' : '📄'} ${item.name}
+            </span>
+            <span class="item-size">
+                ${item.isDir ? 'Folder' : facilitateSize(item.size)}
+            </span>
+        `
+        
         el.addEventListener("click", (e) => {
-            if (e.ctrlKey) toggleSelection(i)
+            const index = parseInt(el.dataset.index)
+
+            if (e.ctrlKey) toggleSelection(index)
             else clearSelected()
         })
 
@@ -156,7 +178,7 @@ async function loadDirectory(dir) {
 function openItem(item) {
     if (!item) return
 
-    if (item.isDirectory) {
+    if (item.isDir) {
         navigateTo(item.path)
     } else {
         ipcRenderer.invoke("open-file", item.path)
@@ -201,6 +223,8 @@ function changeSelectionArea(dir, ctrl) {
     selectedIndex = newIndex
 
     if (ctrl) {
+        selectedSet.clear()
+
         const start = Math.min(anchorIndex, selectedIndex)
         const end = Math.max(anchorIndex, selectedIndex)
 
@@ -227,16 +251,6 @@ function renderSelection() {
     })
 }
 
-// Misc.
-function normalizePath(path) {
-    path = path.trim().replaceAll("/", "\\")
 
-    if (/^[A-Za-z]:$/.test(path)) {
-        path += "\\"
-    }
 
-    return path
-}
-
-// Starting directory
-navigateTo("C:/")
+navigateTo(homeDir)

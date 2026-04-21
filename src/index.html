@@ -19,18 +19,36 @@
         <div id="top-bar">
             <button id="back-button">◀</button>
             <button id="forward-button">▶</button>
+            <button id="refresh-button"><span class=reload>&#x21bb;</span></button>
             <input type="text" placeholder="Directory" id="address-bar">
             <button id="menu-button">☰</button>
         </div>
         <div id="app-content">
             <div id="file-list">
-                <div class="file-item">📁 Users</div> <!-- Dummy items for testing and modifying the HTML/CSS design from a live server -->
-                <div class="file-item">📁 Program Files</div> <!-- They get deleted anyways when loading the initial directory -->
-                <div class="file-item">📁 Windows</div>
-
-                <div class="file-item">📄 README.txt</div>
-                <div class="file-item">📄 notes.md</div>
-                <div class="file-item">📄 mfexplorer.exe</div>
+                <div class="file-item">                     <!-- Dummy items for testing and modifying the HTML/CSS design from a live server -->
+                    <span class="item-name">📁 Users</span> <!-- They get deleted anyways when loading the initial directory -->
+                    <span class="item-size"></span>
+                </div> 
+                <div class="file-item">
+                    <span class="item-name">📁 Program Files</span>
+                    <span class="item-size"></span>
+                </div> 
+                <div class="file-item">
+                    <span class="item-name">📁 Windows</span>
+                    <span class="item-size"></span>
+                </div>
+                <div class="file-item">
+                    <span class="item-name">📄 README.txt</span>
+                    <span class="item-size">5 MB</span>
+                </div>
+                <div class="file-item">
+                    <span class="item-name">📄 notes.md</span>
+                    <span class="item-size">5 MB</span>
+                </div>
+                <div class="file-item">
+                    <span class="item-name">📄 mfexplorer.exe</span>
+                    <span class="item-size">5 MB</span>
+                </div>
             </div>
         </div>
     </div>

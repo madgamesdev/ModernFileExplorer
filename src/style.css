@@ -85,6 +85,7 @@ html, body{
     font-size: calc(var(--element-size) / 2px);
     justify-content: center;
     align-items: center;
+    user-select: none;
 }
 #top-bar button:hover {
     background-color: #575757;
@@ -145,6 +146,7 @@ html, body{
     overflow-y: auto;
 }
 .file-item {
+    display: flex;
     padding: 6px 10px;
     border-radius: calc(var(--border-radius) + 2px);
     user-select: none;
@@ -155,6 +157,10 @@ html, body{
 .file-item.selected {
     background-color: var(--light-accent-color);
     color: white;
+}
+
+.file-item .item-size {
+    margin-left: auto;
 }
 
 /* File List Scroll Bar */
@@ -169,3 +175,15 @@ html, body{
 }
 
 #file-list::-webkit-scrollbar-thumb:active { background-color: rgba(255, 255, 255, 0.1); }
+
+/* Misc */
+
+.reload { 
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    transform: rotate(20deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
