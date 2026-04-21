@@ -159,10 +159,12 @@ html, body{
 .file-item:hover { background-color: #3f3f3f; }
 .file-item:active { background-color: #333333; }
 .file-item.selected {
-    background-image: linear-gradient(var(--light-accent-color), var(--accent-color));
+    /* background-image: linear-gradient(var(--light-accent-color), var(--accent-color)); frutiger aero style*/
+    background-color: var(--accent-color);
     color: white;
     box-shadow: rgba(0, 0, 0, 0.356) 2px 3px 15px;
 }
+
 .file-item.selected::after {
     content: "";
     position: absolute;
