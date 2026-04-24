@@ -94,5 +94,3 @@ dist
 .webpack/
 
 .svelte-kit
-
-*.code-workspace
