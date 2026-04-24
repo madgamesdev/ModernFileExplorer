@@ -7,6 +7,8 @@ const addressBar = document.getElementById('address-bar')
 const fileList = document.getElementById("file-list")
 const fileItems = () => Array.from(document.querySelectorAll('.file-item'))
 
+const contextMenu = document.getElementById('context-menu')
+
 const backButton = document.getElementById("back-button")
 const forwardButton = document.getElementById("forward-button")
 const refreshButton = document.getElementById("refresh-button")
@@ -38,9 +40,9 @@ document.getElementById('Close').addEventListener('click', () => {
 })
 
 // Theme
-ipcRenderer.on("set-accent-color", (_e, color) => {
-    const lightAccentColor = adjustColorBrightness(color, 40)
-    const lighterAccentColor = adjustColorBrightness(color, 70)
+ipcRenderer.on('set-accent-color', (_e, color) => {
+    const lightAccentColor = adjustColorBrightness(color, 30)
+    const lighterAccentColor = adjustColorBrightness(color, 60)
     document.documentElement.style.setProperty('--accent-color', color)
     document.documentElement.style.setProperty('--light-accent-color', lightAccentColor)
     document.documentElement.style.setProperty('--lighter-accent-color', lighterAccentColor)
@@ -68,19 +70,19 @@ function navigateTo(path, addToHistory = true) {
     updateNavButtons()
 }
 
-backButton.addEventListener("click", () => {
+backButton.addEventListener('click', () => {
     if (historyIndex <= 0) return
     historyIndex--
     navigateTo(history[historyIndex], false)
 })
 
-forwardButton.addEventListener("click", () => {
+forwardButton.addEventListener('click', () => {
     if (historyIndex >= history.length - 1) return
     historyIndex++
     navigateTo(history[historyIndex], false)
 })
 
-refreshButton.addEventListener("click", () => {
+refreshButton.addEventListener('click', () => {
     refreshPage()
 })
 
@@ -90,13 +92,13 @@ function updateNavButtons() {
 }
 
 // ADDRESS BAR
-addressBar.addEventListener("keydown", (e) => {
+addressBar.addEventListener('keydown', (e) => {
     if (e.key === "Enter") {
         navigateTo(addressBar.value)
     }
 })
 
-addressBar.addEventListener("focus", () => {
+addressBar.addEventListener('focus', () => {
     addressBar.select()
 })
 
@@ -122,10 +124,27 @@ document.addEventListener('keydown', (e) => {
 })
 
 // File List Empty Space Click
-fileList.addEventListener("click", (e) => {
-    if (e.ctrlKey || selectedSet.size === 0) return
-    clearSelected()
+fileList.addEventListener('click', (e) => {
+    if (!e.ctrlKey && selectedSet.size !== 0) { clearSelected() }
 })
+
+// File List Empty Space Context Menu Click
+fileList.addEventListener('contextmenu', (e) => {
+    if (contextMenu.contains(e.target)) return 
+    e.preventDefault()
+
+    contextMenu.style.display = 'block' // If the click was not on the context menu itself, show and reposition the context menu
+
+    contextMenu.style.left = `${e.pageX}px`
+    contextMenu.style.top = `${e.pageY}px`
+})
+
+// Anywhere Context Menu Click
+document.addEventListener('click', (e) => {
+    if (contextMenu.contains(e.target)) return
+    contextMenu.style.display = 'none' // If the click was not on the context menu itself, hide the context menu
+})
+
 
 // Load dir
 async function loadDirectory(dir) {

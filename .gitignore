@@ -85,8 +85,6 @@ dist
 
 .vscode-test
 
-.vscode/
-
 .yarn/cache
 .yarn/unplugged
 .yarn/build-state.yml
