@@ -62,13 +62,11 @@ function normalizePath(input) {
     if (process.platform === 'win32'){
         p = p.replaceAll('/', '\\')
 
-        try {
-            p = fs.realpathSync.native(p)
-        } catch (e) {}
-        
-        if (/^[A-Za-z]:$/.test(p)) {
-            p += "\\"
-        }
+        try { p = fs.realpathSync.native(p) } catch (e) {}
+
+        if (/^[A-Za-z]:$/.test(p)) { p += "\\" }
+
+        if (/^[a-z]:/.test(p)) { p = p[0].toUpperCase() + p.slice(1) }
     }
 
     return p
