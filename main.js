@@ -3,6 +3,7 @@ const { spawn } = require('child_process')
 const path = require('path')
 
 let win
+let py
 
 function createWindow() {
     win = new BrowserWindow({
@@ -15,8 +16,8 @@ function createWindow() {
     frame: false,
     webPreferences: {
         nodeIntegration: true,
-        contextIsolation: false,
-        devTools: false
+        contextIsolation: false
+        // devTools: false
     }
     })
 

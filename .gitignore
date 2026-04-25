@@ -67,7 +67,7 @@ out
 .nuxt
 dist
 
-.cache/
+.cache/git
 
 .vuepress/dist
 
