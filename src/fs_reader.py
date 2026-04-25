@@ -36,7 +36,7 @@ def list_dir(path):
                 except: # Prolly permission stuff
                     continue
     except Exception as ex:
-        return {"error", str(ex)}
+        return {"error": str(ex)}
     
     return items
 
