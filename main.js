@@ -5,40 +5,61 @@ const path = require('path')
 let win
 let py
 
+let pendingResolve = null
+let buffer = ''
+const queue = []
+
 function createWindow() {
     win = new BrowserWindow({
-    width: 1000,
-    height: 700,
-    minWidth: 300,
-    minHeight: 200,
-    icon: path.join(__dirname, 'src/misc/icon.png'),
-    title: 'MFExplorer',
-    frame: false,
-    webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
-        devTools: false
-    }
+        width: 1000,
+        height: 700,
+        minWidth: 300,
+        minHeight: 200,
+        icon: path.join(__dirname, 'src/misc/icon.png'),
+        title: 'MFExplorer',
+        frame: false,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+            devTools: false
+        }
     })
 
     win.loadFile(path.join(__dirname, 'src', 'index.html'))
 
-    py = spawn("python", [path.join(__dirname, 'src', 'fs_reader.py')])
+    py = spawn(process.env.PYTHON || "python", [
+        path.join(__dirname, 'src', 'fs_reader.py')
+    ])
 
     py.stdout.on("data", (data) => {
-        const msg = data.toString()
+        buffer += data.toString()
 
-        if (msg.includes('init')) return
+        try {
+            const parsed = JSON.parse(buffer.trim())
+            buffer = ''
+
+            const resolve = queue.shift()
+            if (resolve) resolve(parsed)
+
+        } catch {}
+    })
+
+    py.stderr.on("data", (data) => {
+        console.error("PY ERROR:", data.toString())
+        buffer = ''
+
+        if (pendingResolve) {
+            pendingResolve({ error: data.toString() })
+            pendingResolve = null
+        }
     })
 
     win.webContents.on('did-finish-load', sendAccentColor)
-    if (process.platform === 'win32'){
-        systemPreferences.on("accent-color-changed", () => {
-        sendAccentColor()
-    })
-  }
-}
 
+    if (process.platform === 'win32') {
+        systemPreferences.on("accent-color-changed", sendAccentColor)
+    }
+}
 app.whenReady().then(createWindow)
 
 app.on("window-all-closed", () => {
@@ -66,33 +87,8 @@ ipcMain.on('window-control', (event, action) => {
 
 ipcMain.handle("list-directory", async (_event, dirPath) => {
     return new Promise((resolve) => {
-        let output = ''; let error = ''
-
-        const onData = (data) => {
-            output += data.toString()
-
-            try {
-                const parsed = JSON.parse(output.trim())
-
-                cleanup()
-                resolve(parsed)
-            } catch {}
-        }
-
-        const onError = (data) => {
-            error += data.toString()
-            cleanup()
-            resolve({ error })
-        }
-
-        const cleanup = () => {
-            py.stdout.off('data', onData)
-            py.stderr.off('data', onError)
-        }
-
-        py.stdout.on('data', onData)
-        py.stderr.on('data', onError)
-
+        queue.push(resolve)
+        buffer = ''
         py.stdin.write(dirPath + '\n')
     })
 })

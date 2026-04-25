@@ -4,8 +4,10 @@ const { initNavigation } = require('./nav')
 const { navigateTo } = require('./dir')
 const state = require('./state')
 
-initWindowControls()
-initTheme()
-initNavigation()
+window.addEventListener('DOMContentLoaded', () => {
+    initWindowControls()
+    initTheme()
+    initNavigation()
 
-navigateTo(state.homeDir)
+    navigateTo(state.homeDir)
+})
