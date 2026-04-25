@@ -23,14 +23,17 @@ function createWindow() {
 
     win.loadFile(path.join(__dirname, 'index.html'))
 
-    
     const fsReaderPath = app.isPackaged
-    ? path.join(process.resourcesPath, 'app.asar.unpacked', 'src', 'fs_reader.py')
-    : path.join(__dirname, 'fs_reader.py') // Dev
+        ? path.join(process.resourcesPath, 'app.asar.unpacked', 'src', 'fs_reader.py')
+        : path.join(__dirname, 'fs_reader.py')
 
-    py = spawn(process.env.PYTHON || "python", [fsReaderPath])
+    py = spawn(process.env.PYTHON || "python", [fsReaderPath], {
+        stdio: ['pipe', 'pipe', 'pipe'] // important for stability
+    })
 
     py.stdout.on("data", (data) => {
+        if (!win || win.isDestroyed()) return
+
         const lines = data.toString().split("\n")
 
         for (const line of lines) {
@@ -39,16 +42,20 @@ function createWindow() {
             try {
                 const msg = JSON.parse(line)
                 win.webContents.send("fs-stream", msg)
-            } catch {}
+            } catch (err) {}
         }
     })
 
     py.stderr.on("data", (data) => {
+        if (!win || win.isDestroyed()) return
+
         win.webContents.send("fs-stream", {
             type: "error",
             error: data.toString()
         })
     })
+
+    py.on("exit", (code) => { return })
 
     win.webContents.on('did-finish-load', sendAccentColor)
 
@@ -64,42 +71,24 @@ app.on("window-all-closed", () => {
     if (process.platform !== 'darwin') app.quit()
 })
 
-ipcMain.on('window-control', (event, action) => {
+
+ipcMain.on('window-control', (_event, action) => {
     if (!win) return
 
     switch (action) {
-        case 'minimize':
-            win.minimize()
-            break
-        case 'maximize':
-            win.isMaximized() ? win.unmaximize() : win.maximize()
-            break
-        case 'close':
-            win.close()
-            break
+        case 'minimize': win.minimize(); break
+        case 'maximize': win.isMaximized() ? win.unmaximize() : win.maximize(); break
+        case 'close': win.close(); break
     }
 })
 
-ipcMain.handle("list-directory", async (_event, dir) => {
-    if (!py) return { error: "Python process not running" }
+ipcMain.on("list-directory", (_event, { dir, token }) => {
+    if (!py || py.killed) return
 
-    return new Promise((resolve) => {
-        const token = Date.now().toString()
+    if (typeof dir !== "string" || !dir.trim()) return
 
-        const listener = (data) => {
-            try {
-                const msg = JSON.parse(data.toString())
-                resolve(msg)
-                py.stdout.off("data", listener)
-            } catch {}
-        }
-
-        py.stdout.on("data", listener)
-
-        py.stdin.write(`list|${dir}|${token}\n`)
-    })
+    py.stdin.write(`list|${dir}|${token}\n`)
 })
-
 
 ipcMain.handle('open-file', async (_event, filePath) => {
     return shell.openPath(filePath)

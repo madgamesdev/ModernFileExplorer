@@ -4,14 +4,14 @@ const { getUI } = require('./ui')
 const { normalizePath, facilitateSize } = require('./utils')
 const { clearSelected } = require('./selection')
 
+let currentToken = null
+
 function navigateTo(path, addToHistory = true) {
     path = normalizePath(path)
     if (!path) return
 
     const ui = getUI()
-    const { fileList, addressBar } = ui
-
-    path = normalizePath(path)
+    const { addressBar } = ui
 
     loadDirectory(path)
 
@@ -28,49 +28,71 @@ function navigateTo(path, addToHistory = true) {
     }
 }
 
-async function loadDirectory(dir) {
+function loadDirectory(dir) {
     const ui = getUI()
     const { fileList } = ui
 
-    let result = await ipcRenderer.invoke("list-directory", dir)
-
-    if (result.error) {
-        fileList.innerText = result.error
-        return
-    }
-
-    result = result.filter(i => !i.isHidden)
-    state.currentItems = result
+    if (!fileList) return
 
     fileList.innerHTML = ""
+    state.currentItems = []
 
-    result.forEach((item, i) => {
-        const el = document.createElement("div")
-        el.className = "file-item"
-        el.dataset.index = i
+    currentToken = Date.now().toString()
 
-        el.innerHTML = `
-            <span class="item-name">
-                ${item.isDir ? "📁" : "📄"} ${item.name}
-            </span>
-            <span class="item-size">
-                ${item.isDir ? "Folder" : facilitateSize(item.size)}
-            </span>
-        `
-
-        el.onclick = (e) => {
-            const selection = require('./selection')
-
-            if (e.ctrlKey) selection.toggleSelection(i)
-            else selection.selectSingle(i)
-        }
-
-        el.ondblclick = () => openItem(item)
-
-        fileList.appendChild(el)
+    ipcRenderer.send("list-directory", {
+        dir,
+        token: currentToken
     })
 
-    clearSelected()
+    const handler = (_e, msg) => {
+        if (msg.token && msg.token !== currentToken) return
+
+        if (msg.error) {
+            fileList.innerText = msg.error
+            ipcRenderer.removeListener("fs-stream", handler)
+            return
+        }
+
+        if (msg.type === "chunk") {
+            const visible = msg.data.filter(i => !i.isHidden)
+
+            visible.forEach((item) => {
+                const index = state.currentItems.length
+                state.currentItems.push(item)
+
+                const el = document.createElement("div")
+                el.className = "file-item"
+                el.dataset.index = index
+
+                el.innerHTML = `
+                    <span class="item-name">
+                        ${item.isDir ? "📁" : "📄"} ${item.name}
+                    </span>
+                    <span class="item-size">
+                        ${item.isDir ? "Folder" : facilitateSize(item.size)}
+                    </span>
+                `
+
+                el.onclick = (e) => {
+                    const selection = require('./selection')
+
+                    if (e.ctrlKey) selection.toggleSelection(index)
+                    else selection.selectSingle(index)
+                }
+
+                el.ondblclick = () => openItem(item)
+
+                fileList.appendChild(el)
+            })
+        }
+
+        if (msg.type === "done") {
+            clearSelected()
+            ipcRenderer.removeListener("fs-stream", handler)
+        }
+    }
+
+    ipcRenderer.on("fs-stream", handler)
 }
 
 function openItem(item) {
