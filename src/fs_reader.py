@@ -34,7 +34,7 @@ def list_dir(path):
                         "size": item_stat.st_size,
                         "isHidden": isHidden(i, item_stat),
                     })
-                except (PermissionError, FileNotFoundError): # Permission stuff or the file not existing
+                except: # Permission stuff or the file not existing
                     continue
     except Exception as ex:
         return {"error": str(ex)}
