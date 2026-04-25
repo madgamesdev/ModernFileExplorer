@@ -4,8 +4,8 @@ module.exports = {
     normalizePath
 }
 
-const path = require("path")
-
+const path = require('path')
+const fs = require('fs')
 /**
  * 
  * @param {string} color Hex color (example: #9C2711)
@@ -62,6 +62,10 @@ function normalizePath(input) {
     if (process.platform === 'win32'){
         p = p.replaceAll('/', '\\')
 
+        try {
+            p = fs.realpathSync.native(p)
+        } catch (e) {}
+        
         if (/^[A-Za-z]:$/.test(p)) {
             p += "\\"
         }
