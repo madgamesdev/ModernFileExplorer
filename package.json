@@ -18,10 +18,11 @@
       "target": "portable"
     },
     "files": [
-      "src/main.js",
-      "package.json",
       "src/**/*",
-      "renderer/**/*"
+      "package.json"
+    ],
+    "asarUnpack": [
+      "src/fs_reader.py"
     ]
   },
   "devDependencies": {

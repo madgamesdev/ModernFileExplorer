@@ -24,7 +24,7 @@ function createWindow() {
     win.loadFile(path.join(__dirname, 'index.html'))
 
     py = spawn(process.env.PYTHON || "python", [
-        path.join(__dirname, 'fs_reader.py')
+        path.join(process.resourcesPath, 'app.asar.unpacked', 'src', 'fs_reader.py')
     ])
 
     py.stdout.on("data", (data) => {
