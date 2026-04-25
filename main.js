@@ -5,7 +5,6 @@ const path = require('path')
 let win
 let py
 
-let pendingResolve = null
 let buffer = ''
 const queue = []
 
@@ -45,13 +44,11 @@ function createWindow() {
     })
 
     py.stderr.on("data", (data) => {
-        console.error("PY ERROR:", data.toString())
-        buffer = ''
-
-        if (pendingResolve) {
-            pendingResolve({ error: data.toString() })
-            pendingResolve = null
+        const resolve = queue.shift()
+        if (resolve) {
+            resolve({ error: data.toString() })
         }
+        buffer = ''
     })
 
     win.webContents.on('did-finish-load', sendAccentColor)
@@ -60,6 +57,7 @@ function createWindow() {
         systemPreferences.on("accent-color-changed", sendAccentColor)
     }
 }
+
 app.whenReady().then(createWindow)
 
 app.on("window-all-closed", () => {
@@ -73,11 +71,7 @@ ipcMain.on('window-control', (event, action) => {
             win.minimize()
             break
         case 'maximize':
-            if (win.isMaximized()) {
-                win.unmaximize()
-            } else {
-                win.maximize()
-            }
+            win.isMaximized() ? win.unmaximize() : win.maximize()
             break
         case 'close':
             win.close()
@@ -103,11 +97,12 @@ ipcMain.handle('open-file', async (_event, filePath) => {
 
 function sendAccentColor() {
     if (!win || win.isDestroyed()) return
+
     let accentColor = "#9332AB"
-  
-    if (process.platform === "win32"){
+
+    if (process.platform === "win32") {
         const colorPref = systemPreferences.getAccentColor()
-        accentColor = `#${colorPref.substring(0,6)}`
+        accentColor = `#${colorPref.substring(0, 6)}`
     }
 
     win.webContents.send("set-accent-color", accentColor)
