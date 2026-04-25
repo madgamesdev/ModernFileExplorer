@@ -57,16 +57,24 @@ function facilitateSize(bytes) {
 function normalizePath(input) {
     if (!input) return input
 
-    p = input.trim()
+    let p = input.trim()
 
-    if (process.platform === 'win32'){
+    if (process.platform === 'win32') {
         p = p.replaceAll('/', '\\')
 
-        try { p = fs.realpathSync.native(p) } catch (e) {}
+        if (/^[A-Za-z]:$/.test(p)) {
+            p = p + "\\"
+        }
 
-        if (/^[A-Za-z]:$/.test(p)) { p += "\\" }
+        try {
+            p = fs.realpathSync.native(p)
+        } catch (e) {
+            return null
+        }
 
-        if (/^[a-z]:/.test(p)) { p = p[0].toUpperCase() + p.slice(1) }
+        if (/^[a-z]:/.test(p)) {
+            p = p[0].toUpperCase() + p.slice(1)
+        }
     }
 
     return p

@@ -5,7 +5,7 @@
   "license": "MIT",
   "author": "MadGames",
   "type": "commonjs",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder"
@@ -18,7 +18,7 @@
       "target": "portable"
     },
     "files": [
-      "main.js",
+      "src/main.js",
       "package.json",
       "src/**/*",
       "renderer/**/*"

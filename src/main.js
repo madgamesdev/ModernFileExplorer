@@ -5,16 +5,13 @@ const path = require('path')
 let win
 let py
 
-let buffer = ''
-const queue = []
-
 function createWindow() {
     win = new BrowserWindow({
         width: 1000,
         height: 700,
         minWidth: 300,
         minHeight: 200,
-        icon: path.join(__dirname, 'src/misc/icon.png'),
+        icon: path.join(__dirname, 'misc/icon.png'),
         title: 'MFExplorer',
         frame: false,
         webPreferences: {
@@ -24,31 +21,30 @@ function createWindow() {
         }
     })
 
-    win.loadFile(path.join(__dirname, 'src', 'index.html'))
+    win.loadFile(path.join(__dirname, 'index.html'))
 
     py = spawn(process.env.PYTHON || "python", [
-        path.join(__dirname, 'src', 'fs_reader.py')
+        path.join(__dirname, 'fs_reader.py')
     ])
 
     py.stdout.on("data", (data) => {
-        buffer += data.toString()
+        const lines = data.toString().split("\n")
 
-        try {
-            const parsed = JSON.parse(buffer.trim())
-            buffer = ''
+        for (const line of lines) {
+            if (!line.trim()) continue
 
-            const resolve = queue.shift()
-            if (resolve) resolve(parsed)
-
-        } catch {}
+            try {
+                const msg = JSON.parse(line)
+                win.webContents.send("fs-stream", msg)
+            } catch {}
+        }
     })
 
     py.stderr.on("data", (data) => {
-        const resolve = queue.shift()
-        if (resolve) {
-            resolve({ error: data.toString() })
-        }
-        buffer = ''
+        win.webContents.send("fs-stream", {
+            type: "error",
+            error: data.toString()
+        })
     })
 
     win.webContents.on('did-finish-load', sendAccentColor)
@@ -66,6 +62,8 @@ app.on("window-all-closed", () => {
 })
 
 ipcMain.on('window-control', (event, action) => {
+    if (!win) return
+
     switch (action) {
         case 'minimize':
             win.minimize()
@@ -79,20 +77,29 @@ ipcMain.on('window-control', (event, action) => {
     }
 })
 
-ipcMain.handle("list-directory", async (_event, dirPath) => {
+ipcMain.handle("list-directory", async (_event, dir) => {
+    if (!py) return { error: "Python process not running" }
+
     return new Promise((resolve) => {
-        queue.push(resolve)
-        buffer = ''
-        py.stdin.write(dirPath + '\n')
+        const token = Date.now().toString()
+
+        const listener = (data) => {
+            try {
+                const msg = JSON.parse(data.toString())
+                resolve(msg)
+                py.stdout.off("data", listener)
+            } catch {}
+        }
+
+        py.stdout.on("data", listener)
+
+        py.stdin.write(`list|${dir}|${token}\n`)
     })
 })
 
+
 ipcMain.handle('open-file', async (_event, filePath) => {
-    try {
-        await shell.openPath(filePath)
-    } catch (err) {
-        console.error(err)
-    }
+    return shell.openPath(filePath)
 })
 
 function sendAccentColor() {

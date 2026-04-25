@@ -1,5 +1,10 @@
 const state = require('./state')
-const { fileItems } = require('./ui')
+const { getUI } = require('./ui')
+
+function getFileItems() {
+    const ui = getUI()
+    return ui.fileItems()
+}
 
 function clearSelected() {
     state.selectedSet.clear()
@@ -28,7 +33,7 @@ function toggleSelection(index) {
 }
 
 function changeSelectionArea(dir, ctrl) {
-    const items = fileItems()
+    const items = getFileItems()
     if (!items.length) return
 
     if (state.selectedIndex === -1) state.selectedIndex = 0
@@ -57,7 +62,7 @@ function changeSelectionArea(dir, ctrl) {
 }
 
 function renderSelection() {
-    const items = fileItems()
+    const items = getFileItems()
 
     items.forEach((el, i) => {
         el.classList.toggle("selected", state.selectedSet.has(i))

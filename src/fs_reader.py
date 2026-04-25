@@ -44,10 +44,18 @@ def list_dir(path):
 print("init", flush=True)
 
 for line in sys.stdin:
-    path = line.strip()
+    line = line.strip()
+    if not line:
+        continue
 
     try:
+        cmd, path, token = line.split("|", 2)
+    except ValueError:
+        print(json.dumps({"error": "Invalid command format"}), flush=True)
+        continue
+
+    if cmd == "list":
         result = list_dir(path)
         print(json.dumps(result), flush=True)
-    except Exception as ex:
-        print(json.dumps({"error": str(ex)}), flush=True)
+    else:
+        print(json.dumps({"error": f"Unknown command {cmd}"}), flush=True)

@@ -1,16 +1,24 @@
 const { ipcRenderer } = require('electron')
 const state = require('./state')
-const { fileList, addressBar } = require('./ui')
+const { getUI } = require('./ui')
 const { normalizePath, facilitateSize } = require('./utils')
 const { clearSelected } = require('./selection')
 
 function navigateTo(path, addToHistory = true) {
+    path = normalizePath(path)
     if (!path) return
+
+    const ui = getUI()
+    const { fileList, addressBar } = ui
 
     path = normalizePath(path)
 
     loadDirectory(path)
-    addressBar.value = path
+
+    if (addressBar) {
+        addressBar.value = path
+    }
+
     state.currentDir = path
 
     if (addToHistory) {
@@ -21,6 +29,9 @@ function navigateTo(path, addToHistory = true) {
 }
 
 async function loadDirectory(dir) {
+    const ui = getUI()
+    const { fileList } = ui
+
     let result = await ipcRenderer.invoke("list-directory", dir)
 
     if (result.error) {
@@ -48,11 +59,10 @@ async function loadDirectory(dir) {
         `
 
         el.onclick = (e) => {
-            const index = i
             const selection = require('./selection')
 
-            if (e.ctrlKey) selection.toggleSelection(index)
-            else selection.selectSingle(index)
+            if (e.ctrlKey) selection.toggleSelection(i)
+            else selection.selectSingle(i)
         }
 
         el.ondblclick = () => openItem(item)

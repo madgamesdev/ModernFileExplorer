@@ -1,8 +1,12 @@
-const { contextMenu } = require('./ui')
+const { getUI } = require('./ui')
 
 let active = false
+let contextMenu
 
 function initContextMenu() {
+    const ui = getUI()
+    contextMenu = ui.contextMenu
+
     document.addEventListener('click', (e) => {
         if (contextMenu.contains(e.target)) return
         toggle(false)
@@ -11,11 +15,19 @@ function initContextMenu() {
     contextMenu.addEventListener('contextmenu', (e) => {
         e.preventDefault()
     })
+
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault()
+        toggle(true)
+
+        contextMenu.style.left = `${e.pageX}px`
+        contextMenu.style.top = `${e.pageY}px`
+    })
 }
 
-function toggle(state = !active) {
-    active = state
-    contextMenu.style.display = state ? 'block' : 'none'
+function toggle(nextState = !active) {
+    active = nextState
+    contextMenu.style.display = nextState ? 'block' : 'none'
 }
 
 module.exports = { initContextMenu, toggle }
