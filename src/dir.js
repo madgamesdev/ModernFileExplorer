@@ -79,6 +79,8 @@ function loadDirectory(dir) {
                     else selection.selectSingle(index)
                 }
 
+                el.addEventListener('contextmenu', (e) => { selection.selectSingle(index) })
+
                 el.ondblclick = () => openItem(item)
 
                 fileList.appendChild(el)

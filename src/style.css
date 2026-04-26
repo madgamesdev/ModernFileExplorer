@@ -196,6 +196,10 @@ html, body{
     backdrop-filter: blur(20px);
     box-shadow: rgba(30, 30, 30, 0.418) 2px 3px 12px;
     user-select: none;
+
+    animation-name: context-menu-fade-in;
+    animation-duration: 0.25s;
+    animation-timing-function: ease-out;
 }
 #context-menu::after {
     content: "";
@@ -205,6 +209,10 @@ html, body{
     border-radius: inherit;
     pointer-events: none;
     z-index: 0;
+}
+@keyframes context-menu-fade-in {
+    from { opacity: 0%; }
+    to { opacity: 100%; }
 }
 
 #context-menu .context-menu-option {
@@ -233,6 +241,27 @@ html, body{
     margin-top: 0;
     margin-bottom: 0;
     margin-left: 4px;
+}
+
+#tooltip {
+    position: absolute;
+
+    font-family: var(--font);
+    font-weight: 500;
+    font-size: 12px;
+
+    background-color: rgb(241, 241, 241);
+    color: black;
+    padding: 5px 8px;
+    border-radius: 3px;
+    opacity: 0;
+
+    white-space: nowrap;
+
+    z-index: 999;
+    transition: opacity 0.2s ease;
+
+    pointer-events: none;
 }
 
 hr {
