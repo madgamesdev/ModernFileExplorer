@@ -98,14 +98,13 @@ html, body{
     align-items: center;
     user-select: none;
 }
-#top-bar button:hover {
-    background-color: #575757;
-}
+#top-bar button:hover { background-color: #575757; }
 #top-bar button:active {
     background-color: #464646;
     border: var(--light-accent-color) solid 1px;
     box-shadow: var(--accent-color) 0px 0px 8px;
 }
+#top-bar button:focus { outline: none; }
 
 #top-bar input {
     -webkit-app-region: no-drag;
@@ -117,9 +116,7 @@ html, body{
     border-radius: var(--border-radius);
     font-size: calc(var(--element-size) / 2);
 }
-#top-bar input:active {
-    border: rgb(161, 161, 161) solid 1px;
-}
+#top-bar input:active { border: rgb(161, 161, 161) solid 1px; }
 #top-bar input:focus {
     outline: none;
     border: var(--light-accent-color) solid 1px;
@@ -222,10 +219,6 @@ html, body{
     pointer-events: none;
     z-index: 0;
 }
-@keyframes context-menu-fade-in {
-    from { opacity: 0%; }
-    to { opacity: 100%; }
-}
 
 #context-menu .context-menu-option {
     position: relative;
@@ -308,4 +301,10 @@ hr {
     display: inline-block;
     justify-content: center;
     align-items: center;
+}
+
+/* Anims */
+@keyframes context-menu-fade-in {
+    from { opacity: 0%; }
+    to { opacity: 100%; }
 }
