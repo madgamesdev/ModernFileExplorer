@@ -32,7 +32,7 @@ class Tooltip {
             clearTimeout(timeout)
 
             this.hoverTimeouts.delete(el)
-
+            
             if (this.tooltip) this.tooltip.style.opacity = '0'
         })
 

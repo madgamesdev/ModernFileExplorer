@@ -14,9 +14,10 @@
 html, body{
     margin: 0;
     height: 100%;
+    background-color: var(--bg-color);
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box;}
 
 #title-bar {
   -webkit-app-region: drag; 
@@ -124,7 +125,9 @@ html, body{
     overflow: hidden;
     position: relative;
 }
+
 #app-content { height: 100%; }
+
 #window-border {
     border: var(--window-border-thickness) var(--accent-color) solid;
     height: 100%;
@@ -244,7 +247,7 @@ html, body{
 }
 
 #tooltip {
-    position: absolute;
+    position: fixed;
 
     font-family: var(--font);
     font-weight: 500;
@@ -262,6 +265,7 @@ html, body{
     transition: opacity 0.2s ease;
 
     pointer-events: none;
+    will-change: transform, opacity;
 }
 
 hr {
