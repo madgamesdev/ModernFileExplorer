@@ -78,13 +78,22 @@ html, body{
 #top-bar button {
     display: flex;
     -webkit-app-region: no-drag;
+
     background-color: #353535;
     border: rgb(161, 161, 161) solid 1px;
     color: white;
-    height: var(--element-size);
-    width: calc(var(--element-size) + 2px);
+
+    width: var(--element-size); height: var(--element-size);
+    min-width: var(--element-size); max-width: var(--element-size);
+    min-height: var(--element-size); max-height: var(--element-size);
+    
     border-radius: var(--border-radius);
     font-size: calc(var(--element-size) / 2px);
+
+    flex-shrink: 0;
+    flex-grow: 0;
+    flex-basis: var(--element-size);
+
     justify-content: center;
     align-items: center;
     user-select: none;
@@ -293,8 +302,10 @@ hr {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 20px;
     font-weight: 900;
+    line-height: 1;
+
     transform: rotate(20deg);
-    display: flex;
+    display: inline-block;
     justify-content: center;
     align-items: center;
 }

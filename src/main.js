@@ -9,8 +9,8 @@ function createWindow() {
     win = new BrowserWindow({
         width: 1000,
         height: 700,
-        minWidth: 300,
-        minHeight: 200,
+        minWidth: 400,
+        minHeight: 500,
         icon: path.join(__dirname, 'misc/icon.png'),
         title: 'MFExplorer',
         frame: false,
