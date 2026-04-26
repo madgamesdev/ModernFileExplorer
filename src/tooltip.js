@@ -3,9 +3,7 @@ class Tooltip {
         this.tooltip = document.getElementById('tooltip')
         this.hoverTimeouts = new WeakMap()
 
-        if (!this.tooltip) {
-            console.error('Tooltip element missing in HTML')
-        }
+        if (!this.tooltip) console.error('Tooltip element missing in HTML')
     }
 
     followPointer(e) {
@@ -35,9 +33,7 @@ class Tooltip {
 
             this.hoverTimeouts.delete(el)
 
-            if (this.tooltip) {
-                this.tooltip.style.opacity = '0'
-            }
+            if (this.tooltip) this.tooltip.style.opacity = '0'
         })
 
         el.addEventListener('mousemove', (e) => {
