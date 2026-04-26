@@ -3,9 +3,9 @@ import sys
 import stat
 import json
 
-chunk_size = 200
+chunk_size = 30
 
-def isHidden(item, item_stat=None):
+def isHidden(item, item_stat):
     if item.name.startswith("."):
         return True
 

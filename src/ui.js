@@ -1,9 +1,9 @@
 const addressBar = document.getElementById('address-bar')
-const fileList = document.getElementById("file-list")
+const fileList = document.getElementById('file-list')
 
-const backButton = document.getElementById("back-button")
-const forwardButton = document.getElementById("forward-button")
-const refreshButton = document.getElementById("refresh-button")
+const backButton = document.getElementById('back-button')
+const forwardButton = document.getElementById('forward-button')
+const refreshButton = document.getElementById('refresh-button')
 
 const contextMenu = document.getElementById('context-menu')
 

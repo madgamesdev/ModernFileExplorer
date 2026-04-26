@@ -3,6 +3,7 @@ const state = require('./state')
 const { getUI } = require('./ui')
 const { normalizePath, facilitateSize } = require('./utils')
 const { clearSelected } = require('./selection')
+const selection = require('./selection')
 
 let currentToken = null
 
@@ -34,12 +35,12 @@ function loadDirectory(dir) {
 
     if (!fileList) return
 
-    fileList.innerHTML = ""
+    fileList.innerHTML = ''
     state.currentItems = []
 
     currentToken = Date.now().toString()
 
-    ipcRenderer.send("list-directory", {
+    ipcRenderer.send('list-directory', {
         dir,
         token: currentToken
     })
@@ -49,33 +50,31 @@ function loadDirectory(dir) {
 
         if (msg.error) {
             fileList.innerText = msg.error
-            ipcRenderer.removeListener("fs-stream", handler)
+            ipcRenderer.removeListener('fs-stream', handler)
             return
         }
 
-        if (msg.type === "chunk") {
+        if (msg.type === 'chunk') {
             const visible = msg.data.filter(i => !i.isHidden)
 
             visible.forEach((item) => {
                 const index = state.currentItems.length
                 state.currentItems.push(item)
 
-                const el = document.createElement("div")
-                el.className = "file-item"
+                const el = document.createElement('div')
+                el.className = 'file-item'
                 el.dataset.index = index
 
                 el.innerHTML = `
-                    <span class="item-name">
-                        ${item.isDir ? "📁" : "📄"} ${item.name}
+                    <span class='item-name'>
+                        ${item.isDir ? '📁' : '📄'} ${item.name}
                     </span>
-                    <span class="item-size">
-                        ${item.isDir ? "Folder" : facilitateSize(item.size)}
+                    <span class='item-size'>
+                        ${item.isDir ? 'Folder' : facilitateSize(item.size)}
                     </span>
                 `
 
                 el.onclick = (e) => {
-                    const selection = require('./selection')
-
                     if (e.ctrlKey) selection.toggleSelection(index)
                     else selection.selectSingle(index)
                 }
@@ -86,20 +85,20 @@ function loadDirectory(dir) {
             })
         }
 
-        if (msg.type === "done") {
+        if (msg.type === 'done') {
             clearSelected()
-            ipcRenderer.removeListener("fs-stream", handler)
+            ipcRenderer.removeListener('fs-stream', handler)
         }
     }
 
-    ipcRenderer.on("fs-stream", handler)
+    ipcRenderer.on('fs-stream', handler)
 }
 
 function openItem(item) {
     if (item.isDir) {
         navigateTo(item.path)
     } else {
-        ipcRenderer.invoke("open-file", item.path)
+        ipcRenderer.invoke('open-file', item.path)
     }
 }
 

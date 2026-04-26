@@ -22,7 +22,7 @@
       "package.json"
     ],
     "asarUnpack": [
-      "src/fs_reader.py"
+      "src/**/*.py"
     ]
   },
   "devDependencies": {

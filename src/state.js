@@ -11,7 +11,7 @@ const state = {
 
     history: [],
     historyIndex: -1,
-    currentDir: ""
+    currentDir: ''
 }
 
 module.exports = state

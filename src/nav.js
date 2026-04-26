@@ -13,7 +13,7 @@ function initNavigation() {
     forwardButton.onclick = () => goForward()
 
     addressBar.addEventListener('keydown', (e) => {
-        if (e.key === "Enter") navigateTo(addressBar.value)
+        if (e.key === 'Enter') navigateTo(addressBar.value)
     })
 
     addressBar.addEventListener('focus', () => addressBar.select())

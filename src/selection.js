@@ -65,11 +65,11 @@ function renderSelection() {
     const items = getFileItems()
 
     items.forEach((el, i) => {
-        el.classList.toggle("selected", state.selectedSet.has(i))
+        el.classList.toggle('selected', state.selectedSet.has(i))
     })
 
     items[state.selectedIndex]?.scrollIntoView({
-        block: "nearest"
+        block: 'nearest'
     })
 }
 

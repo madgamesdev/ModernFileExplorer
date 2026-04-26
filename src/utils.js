@@ -38,7 +38,7 @@ function adjustColorBrightness(color, amount){
  * @returns {string} User-friendly file size
  */
 function facilitateSize(bytes) {
-    if (bytes === 0) return "0 B"
+    if (bytes === 0) return '0 B'
 
     const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
@@ -63,7 +63,7 @@ function normalizePath(input) {
         p = p.replaceAll('/', '\\')
 
         if (/^[A-Za-z]:$/.test(p)) {
-            p = p + "\\"
+            p = p + '\\'
         }
 
         try {
