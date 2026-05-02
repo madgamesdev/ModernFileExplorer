@@ -1,11 +1,14 @@
 module.exports = {
     adjustColorBrightness,
     facilitateSize,
-    normalizePath
+    normalizePath,
+    detectOS
 }
 
 const path = require('path')
 const fs = require('fs')
+const os = require('os')
+
 /**
  * 
  * @param {string} color Hex color (example: #9C2711)
@@ -48,6 +51,19 @@ function facilitateSize(bytes) {
     return `${size.toFixed(i === 0 ? 0 : 1)} ${units[i]}`
 }
 
+/**
+ * 
+ * @returns 0 if not Windows, 1 if Windows 10 or earlier and 2 if Windows 11 or later
+ */
+function detectOS() {
+    if (process.platform !== 'win32') return 0
+
+    const release = os.release()
+    const build = parseInt(release.split('.')[2] || '0', 10)
+
+    if (build >= 22000) return 2 // Windows 11
+    return 1 // Windows 10 or earlier
+}
 
 /**
  * 

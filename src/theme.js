@@ -1,37 +1,34 @@
 const { ipcRenderer } = require('electron')
-const { adjustColorBrightness } = require('./utils')
-const os = require('os')
+const { adjustColorBrightness, detectOS } = require('./utils')
 const { getUI } = require('./ui')
+const { desktopCapturer } = require('electron/main')
 
 function setWindowBorderUp() {
-    let style = 0
-
-    const release = os.release()
-    const build = parseInt(release.split('.')[2] || '0', 10)
-
-    if (process.platform === 'win32' && build >= 22000) {
-        style = 2 // Windows 11
-    } else if (process.platform === 'win32') {
-        style = 1 // Windows 10
-    } else {
-        style = 0 // not Windows
-    }
-
     const ui = getUI()
+    if (!ui.border) return
 
-    if (ui.border) {
-        switch (style) {
-            case 1:
-                ui.border.style.borderRadius = '0px'
-                break
-            case 2:
-                ui.border.style.borderRadius = '8px'
-                break
-            default:
-                ui.border.style.display = 'none'
-                break
-        }
+    const osType = detectOS()
+    switch (osType) {
+        case 1: // Win 10
+            ui.border.style.borderRadius = '0px'
+            break
+        case 2:
+            ui.border.style.borderRadius = '8px'
+            break
+        default:
+            // Not Windows
+            ui.border.style.display = 'none'
+            break
     }
+}
+
+/* Make the border-radius of our custom window border 0px when maximized
+   or 8px when not, to match the Windows 11 window logic */
+function applyBorderRadius(isMaximized) {
+    const ui = getUI()
+    if (!ui.border) return
+
+    ui.border.style.borderRadius = isMaximized ? '0px' : '8px'                                                          
 }
 
 function initTheme() {
@@ -45,6 +42,12 @@ function initTheme() {
         document.documentElement.style.setProperty('--light-accent-color', light)
         document.documentElement.style.setProperty('--lighter-accent-color', lighter)
     })
-}
+
+    if (detectOS() === 2) { // Win 11 logic
+        ipcRenderer.on('window-maximized', (_e, isMaximized) => {
+            applyBorderRadius(isMaximized)
+        })
+    }
+}    
 
 module.exports = { initTheme }

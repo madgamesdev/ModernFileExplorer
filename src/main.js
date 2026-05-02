@@ -55,6 +55,9 @@ function createWindow() {
 
     py.on('exit', (code) => { return })
 
+    win.on('maximize', () => { win.webContents.send('window-maximized', true) })
+    win.on('unmaximize', () => { win.webContents.send('window-maximized', false) })
+
     win.webContents.on('did-finish-load', sendAccentColor)
 
     if (process.platform === 'win32') {
