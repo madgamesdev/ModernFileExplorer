@@ -15,7 +15,7 @@ function setWindowBorderUp() {
             ui.border.style.borderRadius = '8px'
             break
         case 3: // Mac OS
-            ui.border.style.borderRadius = '16px'
+            ui.border.style.borderRadius = '12pt'
             break
         default:
             // Not Windows
