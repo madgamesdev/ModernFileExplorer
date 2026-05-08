@@ -23,11 +23,18 @@ function createWindow() {
 
     win.loadFile(path.join(__dirname, 'index.html'))
 
+    const pythonCmd =
+    process.env.PYTHON ||
+    (process.platform === 'darwin' ? 'python3' : 'python')
+
+
     const fsReaderPath = app.isPackaged
         ? path.join(process.resourcesPath, 'app.asar.unpacked', 'src', 'fs_reader.py')
         : path.join(__dirname, 'fs_reader.py')
 
-    py = spawn(process.env.PYTHON || 'python', [fsReaderPath], { stdio: ['pipe', 'pipe', 'pipe'] })
+    py = spawn(pythonCmd, [fsReaderPath], {
+        stdio: ['pipe', 'pipe', 'pipe']
+    })
 
     py.stdout.on('data', (data) => {
         if (!win || win.isDestroyed()) return
