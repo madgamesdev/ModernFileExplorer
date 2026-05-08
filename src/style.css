@@ -1,5 +1,6 @@
 :root {
-    --font: 'Segoe UI', Arial, Geneva, Verdana, sans-serif;
+    --mac-os-fonts: system-ui, -apple-system, BlinkMacSystemFont;
+    --font:  var(--mac-os-fonts), "Segoe UI", Roboto, sans-serif;
     --text-color: white;
     --bg-color: #252525;
     --title-bar-color: #1e1e1e;
