@@ -53,11 +53,11 @@ function facilitateSize(bytes) {
 
 /**
  * 
- * @returns 0 if not Windows, 1 if Windows 10 or earlier and 2 if Windows 11 or later
+ * @returns 0 if not Windows, 1 if Windows 10 or earlier, 2 if Windows 11 or later and 3 if Mac OS
  */
 function detectOS() {
-    if (process.platform !== 'win32') return 0
-
+    if (process.platform === 'darwin') return 3
+    else if (process.platform !== 'win32') return 0
     const release = os.release()
     const build = parseInt(release.split('.')[2] || '0', 10)
 

@@ -1,7 +1,6 @@
 const { ipcRenderer } = require('electron')
 const { adjustColorBrightness, detectOS } = require('./utils')
 const { getUI } = require('./ui')
-const { desktopCapturer } = require('electron/main')
 
 function setWindowBorderUp() {
     const ui = getUI()
@@ -12,8 +11,11 @@ function setWindowBorderUp() {
         case 1: // Win 10
             ui.border.style.borderRadius = '0px'
             break
-        case 2:
+        case 2: // Win 11
             ui.border.style.borderRadius = '8px'
+            break
+        case 3: // Mac OS
+            ui.border.style.borderRadius = '16px'
             break
         default:
             // Not Windows

@@ -69,6 +69,8 @@ function createWindow() {
 
     if (process.platform === 'win32') {
         systemPreferences.on('accent-color-changed', sendAccentColor)
+    } else if (process.platform === 'darwin') {
+        systemPreferences.on('appearance-changed', sendAccentColor)
     }
 }
 
@@ -107,10 +109,12 @@ function sendAccentColor() {
 
     let accentColor = '#9332AB'
 
-    if (process.platform === 'win32') {
-        const colorPref = systemPreferences.getAccentColor()
-        accentColor = `#${colorPref.substring(0, 6)}`
+    try {
+        const color = systemPreferences.getAccentColor()
+
+        accentColor = `#${color.substring(0, 6)}`
     }
+    catch {}
 
     win.webContents.send('set-accent-color', accentColor)
 }
