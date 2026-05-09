@@ -14,9 +14,6 @@ function setWindowBorderUp() {
         case 2: // Win 11
             ui.border.style.borderRadius = '8px'
             break
-        case 3: // Mac OS
-            ui.border.style.borderRadius = '12pt'
-            break
         default:
             // Not Windows
             ui.border.style.display = 'none'
